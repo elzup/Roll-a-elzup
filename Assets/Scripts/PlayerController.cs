@@ -8,7 +8,9 @@ public class PlayerController : MonoBehaviour {
 	private int count;
 	public float speed;
 
-	public Text countText;
+	public Text bText;
+	public Text sText;
+	public Text gText;
 	public Text winText;
 
 	private GameStates gameState;
@@ -16,14 +18,26 @@ public class PlayerController : MonoBehaviour {
 
 	public CameraController camera;
 
+	public int countBronzeMax; 
+	private int countBronze;
+	public int countSilverMax; 
+	private int countSilver;
+	public int countGoldMax; 
+	private int countGold;
+
+	public int HideFlagsag;
+
 	public Collider torigger;
 
 	void Start () {
 		rb = GetComponent<Rigidbody>();
 		count = 0;
 		winText.text = "";
-		SetCountText();
 		gameState = GameStates.Progress;
+		this.countGold = 0;
+		this.countSilver = 0;
+		this.countBronze = 0;
+		updateCountText();
 	}
 
 	void FixedUpdate () {
@@ -59,27 +73,32 @@ public class PlayerController : MonoBehaviour {
 			int bound = 0;
 			if (other.name.Contains("First")) {
 				bound = 1000;
+				countBronze += 1;
 			} else if (other.name.Contains("Second")) {
 				bound = 2000;
+				countSilver += 1;
 			} else {
 				bound = 3000;
+				countGold += 1;
 			}
 			Vector3 movement = (rb.transform.position - rb.velocity) - other.transform.position;
 			Vector3 movementXY = new Vector3(movement.x, 0, movement.z);
 			Vector3 force = (movementXY / movementXY.magnitude) * bound;
-			rb.AddForce(force);
 			count += 1;
-			SetCountText();
+			rb.AddForce(force);
+			updateCountText();
+			if (count >= countBronzeMax + countSilverMax + countGoldMax) {
+				winText.text = "You Win!";
+				gameState = GameStates.Finish;
+			}
 		} else if (other.gameObject.tag == "torigger") {
 			this.camera.setOffsetScale(2.0f);
 		}
 	}
 
-	void SetCountText() {
-		countText.text = "Count: " + count.ToString();
-		if (count >= 6) {
-			winText.text = "You Win!";
-			gameState = GameStates.Finish;
-		}
+	private void updateCountText() {
+		bText.text = string.Format("Brond  : {0,2}/{1,2}", countBronze, countBronzeMax);
+		sText.text = string.Format("Silver : {0,2}/{1,2}", countSilver, countSilverMax);
+		gText.text = string.Format("Gold   : {0,2}/{1,2}", countGold, countGoldMax);
 	}
 }
