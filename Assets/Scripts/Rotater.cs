@@ -7,6 +7,8 @@ public class Rotater : MonoBehaviour {
 	Vector3 velocity;
 	Vector3 acceralation;
 
+	public int level;
+
 	bool is_catched;
 
 	void Start() {

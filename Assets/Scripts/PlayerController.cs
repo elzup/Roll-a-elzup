@@ -51,8 +51,18 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "item") {
-			Vector3 movement = other.transform.position - (rb.transform.position - rb.velocity);
-			rb.AddForce(new Vector3(movement.x, 0, movement.z) * - 100);
+			int bound = 0;
+			if (other.name.Contains("First")) {
+				bound = 1000;
+			} else if (other.name.Contains("Second")) {
+				bound = 2000;
+			} else {
+				bound = 3000;
+			}
+			Vector3 movement = (rb.transform.position - rb.velocity) - other.transform.position;
+			Vector3 movementXY = new Vector3(movement.x, 0, movement.z);
+			Vector3 force = (movementXY / movementXY.magnitude) * bound;
+			rb.AddForce(force);
 			count += 1;
 			SetCountText();
 		}
