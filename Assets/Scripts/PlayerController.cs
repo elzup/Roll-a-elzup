@@ -1,14 +1,21 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
-	public float speed;
 
 	private Rigidbody rb;
+	private int count;
+	public float speed;
+
+	public Text countText;
+	public Text winText;
 
 	void Start () {
 		rb = GetComponent<Rigidbody>();
-		speed = 10.0f;
+		count = 0;
+		winText.text = "";
+		SetCountText();
 	}
 	
 	void FixedUpdate () {
@@ -23,6 +30,16 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "item") {
 			other.gameObject.SetActive(false);
+			count += 1;
+			SetCountText();
+		}
+	}
+
+	void SetCountText() {
+		countText.text = "Count: " + count.ToString();
+
+		if (count >= 6) {
+			winText.text = "You Win!";
 		}
 	}
 
