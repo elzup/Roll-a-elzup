@@ -8,10 +8,11 @@ public class CameraController : MonoBehaviour {
 
 	void Start () {
 		offset = transform.position - player.transform.position;
-	
 	}
 	
 	void LateUpdate () {
-		transform.position = player.transform.position + offset;
+		transform.position = offset + Vector3.Scale(Vector3.one - Vector3.up, player.transform.position);
+		// TODO: Camela over position limit.
+		// Mathf.Clamp();
 	}
 }
