@@ -51,11 +51,8 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "item") {
-			other.gameObject.SetActive(false);
-
 			Vector3 movement = other.transform.position - (rb.transform.position - rb.velocity);
 			rb.AddForce(new Vector3(movement.x, 0, movement.z) * - 100);
-//			rb.AddExplosionForce(0.0f, transform.position, 100.0f, 2, ForceMode.VelocityChange);
 			count += 1;
 			SetCountText();
 		}
