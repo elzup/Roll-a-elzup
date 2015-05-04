@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour {
 	private GameStates gameState;
 	enum GameStates { Progress, GameOver, Finish };
 
+	public CameraController camera;
+
+	public Collider torigger;
+
 	void Start () {
 		rb = GetComponent<Rigidbody>();
 		count = 0;
@@ -29,7 +33,7 @@ public class PlayerController : MonoBehaviour {
 		Vector3 movement = new Vector3(moveHorizonal, 0.0f, moveVertical);
 		rb.AddForce(movement * speed);
 
-		if (rb.position.y < -8.0 && gameState == GameStates.Progress) {
+		if (rb.position.y < -10.0 && gameState == GameStates.Progress) {
 			gameState = GameStates.GameOver;
 			winText.text = "Game over";
 			Invoke ("Retry", 3.0f);
@@ -37,6 +41,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Retry() {
+		this.camera.setOffsetScale(1.0f);
 		winText.text = "";
 		rb.position = new Vector3(0.0f, 1.0f, 0.0f);
 		rb.velocity = Vector3.zero;
@@ -65,6 +70,8 @@ public class PlayerController : MonoBehaviour {
 			rb.AddForce(force);
 			count += 1;
 			SetCountText();
+		} else if (other.gameObject.tag == "torigger") {
+			this.camera.setOffsetScale(2.0f);
 		}
 	}
 
