@@ -19,3 +19,6 @@
 *.nib
 *.dylib
 *.dll
+/Assets/Fantasy\ Skybox\ FREE/
+/Assets/Standard\ Assets/
+
