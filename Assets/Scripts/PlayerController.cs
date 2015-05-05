@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
 	public Text sText;
 	public Text gText;
 	public Text winText;
+	Vector3 prevVero;
 
 	private GameStates gameState;
 	enum GameStates { Progress, GameOver, Finish };
@@ -33,7 +34,8 @@ public class PlayerController : MonoBehaviour {
 	System.DateTime startTime;
 	System.TimeSpan scoreTime;
 
-	int itai;
+	public Itai itai;
+	int itaiCount;
 
 	void Start () {
 		rb = GetComponent<Rigidbody>();
@@ -43,12 +45,13 @@ public class PlayerController : MonoBehaviour {
 		this.countGold = 0;
 		this.countSilver = 0;
 		this.countBronze = 0;
-		this.itai = 0;
+		this.itaiCount = 0;
 		this.startTime = System.DateTime.Now;
 		this.scoreTime = new System.TimeSpan();
 		this.timerText.text = "";
 		updateCountText();
 		StartCoroutine(LateStart (0.001f));
+		prevVero = rb.velocity;
 	}
 
 	IEnumerator LateStart(float time) {
@@ -71,15 +74,20 @@ public class PlayerController : MonoBehaviour {
 		float rz = rb.rotation.eulerAngles.z % 360;
 		print (rb.rotation.eulerAngles.x);
 		print (rb.rotation.eulerAngles.z);
-		if ((rx < 30 || 330 < rx) &&
-		    (150 < rz && rz < 210)) {
-			itai ++;
-			Debug.Log (itai);
-		}
 		if (gameState != GameStates.Finish) {
 			scoreTime = (System.DateTime.Now - startTime);
 		}
+		if ((rb.velocity - prevVero).magnitude > 1.0) {
+			cloneItai();
+		}
+		prevVero = rb.velocity;
 		timerText.text = string.Format("Timer {0,2}:{1,2}:{2,3}", scoreTime.Minutes, scoreTime.Seconds, scoreTime.Milliseconds);
+	}
+
+	void cloneItai() {
+		itaiCount ++;
+		Itai newItai = Instantiate(itai, rb.position, rb.rotation) as Itai;
+		Destroy(newItai.gameObject, 1.0f);
 	}
 
 	void Retry() {
