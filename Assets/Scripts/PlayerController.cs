@@ -14,11 +14,15 @@ public class PlayerController : MonoBehaviour {
 	public Text gText;
 	public Text winText;
 	Vector3 prevVero;
+	Vector3 prePrevVero;
 
 	private GameStates gameState;
 	enum GameStates { Progress, GameOver, Finish };
 
-	public CameraController camera;
+	public Camera camera;
+	public Camera ocamera;
+
+	public CameraController ccamera;
 
 	public int countBronzeMax; 
 	private int countBronze;
@@ -35,6 +39,7 @@ public class PlayerController : MonoBehaviour {
 	System.TimeSpan scoreTime;
 
 	public Itai itai;
+	public Itai a;
 	int itaiCount;
 
 	void Start () {
@@ -52,6 +57,10 @@ public class PlayerController : MonoBehaviour {
 		updateCountText();
 		StartCoroutine(LateStart (0.001f));
 		prevVero = rb.velocity;
+		prePrevVero = rb.velocity;
+
+		this.ocamera.enabled = false;
+		this.camera.enabled = true;
 	}
 
 	IEnumerator LateStart(float time) {
@@ -77,11 +86,32 @@ public class PlayerController : MonoBehaviour {
 		if (gameState != GameStates.Finish) {
 			scoreTime = (System.DateTime.Now - startTime);
 		}
-		if ((rb.velocity - prevVero).magnitude > 1.0) {
+		if ((rb.velocity - prePrevVero).magnitude > 3.0) {
 			cloneItai();
 		}
+		prePrevVero = prevVero;
 		prevVero = rb.velocity;
+		Debug.Log(rb.velocity.magnitude);
+		if (rb.velocity.magnitude > 30.0f) {
+			cloneA();
+		}
 		timerText.text = string.Format("Timer {0,2}:{1,2}:{2,3}", scoreTime.Minutes, scoreTime.Seconds, scoreTime.Milliseconds);
+
+		if (Input.GetKeyDown(KeyCode.C)) {
+			if (this.camera.enabled) {
+				this.camera.enabled = false;
+				this.ocamera.enabled = true;
+			} else {
+				this.ocamera.enabled = false;
+				this.camera.enabled = true;
+			}
+		}
+	}
+
+	void cloneA() {
+		itaiCount ++;
+		Itai newItai = Instantiate(a, rb.position, rb.rotation) as Itai;
+		Destroy(newItai.gameObject, 1.0f);
 	}
 
 	void cloneItai() {
@@ -91,7 +121,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Retry() {
-		this.camera.setOffsetScale(1.0f);
+		this.ccamera.setOffsetScale(1.0f);
 		winText.text = "";
 		rb.position = new Vector3(0.0f, 1.0f, 0.0f);
 		rb.velocity = Vector3.zero;
@@ -131,7 +161,7 @@ public class PlayerController : MonoBehaviour {
 				gameState = GameStates.Finish;
 			}
 		} else if (other.gameObject.tag == "torigger") {
-			this.camera.setOffsetScale(2.0f);
+			this.ccamera.setOffsetScale(2.0f);
 		}
 	}
 
