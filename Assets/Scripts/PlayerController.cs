@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
 	private int count;
 	public float speed;
 
+	public Text timerText;
 	public Text bText;
 	public Text sText;
 	public Text gText;
@@ -29,6 +30,11 @@ public class PlayerController : MonoBehaviour {
 
 	public Collider torigger;
 
+	System.DateTime startTime;
+	System.TimeSpan scoreTime;
+
+	int itai;
+
 	void Start () {
 		rb = GetComponent<Rigidbody>();
 		count = 0;
@@ -37,7 +43,16 @@ public class PlayerController : MonoBehaviour {
 		this.countGold = 0;
 		this.countSilver = 0;
 		this.countBronze = 0;
+		this.itai = 0;
+		this.startTime = System.DateTime.Now;
+		this.scoreTime = new System.TimeSpan();
+		this.timerText.text = "";
 		updateCountText();
+		StartCoroutine(LateStart (0.001f));
+	}
+
+	IEnumerator LateStart(float time) {
+		yield return new WaitForSeconds(time);
 	}
 
 	void FixedUpdate () {
@@ -52,6 +67,19 @@ public class PlayerController : MonoBehaviour {
 			winText.text = "Game over";
 			Invoke ("Retry", 3.0f);
 		}
+		float rx = rb.rotation.eulerAngles.x % 360;
+		float rz = rb.rotation.eulerAngles.z % 360;
+		print (rb.rotation.eulerAngles.x);
+		print (rb.rotation.eulerAngles.z);
+		if ((rx < 30 || 330 < rx) &&
+		    (150 < rz && rz < 210)) {
+			itai ++;
+			Debug.Log (itai);
+		}
+		if (gameState != GameStates.Finish) {
+			scoreTime = (System.DateTime.Now - startTime);
+		}
+		timerText.text = string.Format("Timer {0,2}:{1,2}:{2,3}", scoreTime.Minutes, scoreTime.Seconds, scoreTime.Milliseconds);
 	}
 
 	void Retry() {
@@ -70,7 +98,8 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "item") {
-			int bound = 0;
+			float bound = 0;
+			float hbound = 0;
 			if (other.name.Contains("First")) {
 				bound = 1000;
 				countBronze += 1;
@@ -78,17 +107,19 @@ public class PlayerController : MonoBehaviour {
 				bound = 2000;
 				countSilver += 1;
 			} else {
-				bound = 3000;
+				bound = 6000;
 				countGold += 1;
+				hbound = 500.0f;
 			}
+			other.isTrigger = false;
 			Vector3 movement = (rb.transform.position - rb.velocity) - other.transform.position;
 			Vector3 movementXY = new Vector3(movement.x, 0, movement.z);
 			Vector3 force = (movementXY / movementXY.magnitude) * bound;
 			count += 1;
-			rb.AddForce(force);
+			rb.AddForce(new Vector3(force.x, hbound, force.z));
 			updateCountText();
 			if (count >= countBronzeMax + countSilverMax + countGoldMax) {
-				winText.text = "You Win!";
+				winText.text = "You Win! [Score: " + scoreTime.Minutes + "m" + scoreTime.Seconds + "s" + scoreTime.Milliseconds+ "]";
 				gameState = GameStates.Finish;
 			}
 		} else if (other.gameObject.tag == "torigger") {
