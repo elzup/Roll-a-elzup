@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour {
 		float moveVertical = Input.GetAxis("Vertical");
 
 		Vector3 movement = new Vector3(moveHorizonal, 0.0f, moveVertical);
+//		rb.AddForce(Vector3.down * 9.8f);
 		rb.AddForce(movement * speed);
 
 		if (rb.position.y < -10.0 && gameState == GameStates.Progress) {
